@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: 'postgresdb'
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_DB: 'ppdb'
+      POSTGRES_USER: 'ppuser'
+      POSTGRES_PASSWORD: 'VerySecurePassword'
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8'
+    networks:
+      - ppnet
+    # expose:
+    #   - '5455'
+    ports:
+      - '5455:5432'
+    volumes:
+      - postgresdb:/postgresql/data
+volumes:
+  postgresdb:
+networks:
+  ppnet:
+    name: ppnet

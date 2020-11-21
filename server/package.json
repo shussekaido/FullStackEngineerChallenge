@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "npx tsc && node dist/index.js",
+    "start": "npx tsc && node dist/index.js | pino-pretty",
     "test": ""
   },
   "keywords": [],
@@ -12,16 +12,26 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/cors": "^2.8.8",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.9",
+    "@types/express-pino-logger": "^4.0.2",
     "@types/node": "^14.14.9",
+    "@types/pino": "^6.3.4",
+    "@types/sequelize": "^4.28.9",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.13.0",
     "typescript": "^4.1.2"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-pino-logger": "^5.0.0",
+    "pg": "^8.5.1",
+    "pino": "^6.7.0",
+    "pino-pretty": "^4.3.0",
+    "sequelize": "^6.3.5"
   }
 }
