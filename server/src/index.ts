@@ -3,9 +3,13 @@ import dotenv from 'dotenv'
 dotenv.config()
 import cors from 'cors'
 import { router } from './router'
-import { initDB } from './db'
+import { initDB } from './models/db'
 import expressPino from 'express-pino-logger'
 import { log } from './logger'
+import helmet from 'helmet'
+import passport from './auth'
+import cookieParser from 'cookie-parser'
+import expressSession from 'express-session'
 
 const env = process.env.NODE_ENV
 const API_HOST = process.env.API_HOST as string
@@ -15,16 +19,23 @@ const expressLogger = expressPino()
 
 app.use(expressLogger)
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.use(helmet())
+app.use(cookieParser())
 
-app.use('/api', router)
+app.use(expressSession({
+  secret: 'very obscure secret',
+  resave: true,
+  rolling: true,
+  saveUninitialized: false,
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 
-// app.get('/error', (req: Request, res: Response, next: NextFunction) => {
-//   throw new Error('Something went wrong!')
-// })
+app.use('/', router)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: any, req: Request, res: Response) => {
   if (error) {
     log.error(error)
     const status = error.status || 500
