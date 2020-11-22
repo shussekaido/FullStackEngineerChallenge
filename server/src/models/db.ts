@@ -74,6 +74,18 @@ export async function initDB(): Promise<void> {
   }
 }
 
-export async function findByUsername(username) {
-  return await User.findOne({ where: { username: username } })
+export const findByUsername = async (username: string) => {
+  try {
+    return await User.findOne({ where: { username: username } })
+  } catch(error) {
+    log.error(error)
+  }
+}
+
+export const getAllUsers = async () => {
+  try {
+    return await User.findAll()
+  } catch(error) {
+    log.error(error)
+  }
 }
