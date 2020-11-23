@@ -2,7 +2,6 @@ import { log } from './logger'
 import express, { Request, Response, NextFunction } from 'express'
 import passport from './auth'
 import bcrypt from 'bcrypt'
-// import { User } from './models/db'
 import * as users from './models/users'
 export const router = express.Router()
 import connectEnsureLogin from 'connect-ensure-login'
@@ -22,23 +21,21 @@ const showMe = async (req: Request, res: Response) => {
 }
 
 const listEmployees = async (req: Request, res: Response) => {
-  if (isAdmin(req)) {
+  // if (isAdmin(req)) {
     try {
       const employees = await users.findAllUsers()
-      res.json({
-        data: { employees },
-      })
+      res.json({ employees })
     } catch(error) {
       log.error(error)
       res.status(500).json(error)
     }
-  } else {
-    res.status(403).json({ message: 'Forbidden' })
-  }
+  // } else {
+  //   res.status(403).json({ message: 'Forbidden' })
+  // }
 }
 
 const createEmployee = async (req: Request, res: Response) => {
-  if (isAdmin(req)) {
+  // if (isAdmin(req)) {
     try {
       const { username, password } = req.body
       const employee = {
@@ -49,38 +46,37 @@ const createEmployee = async (req: Request, res: Response) => {
       const result = await users.createEmployee(employee)
       log.info(`Obtained new user data: ${JSON.stringify(employee)}`)
 
-      res.json({
-        data: { employee },
-        response: result,
-      })
+      // res.json({
+      //   data: { employee },
+      //   response: result,
+      // })
+      res.json({ result })
     } catch(error) {
       log.error(error)
       res.status(500).json(error)
     }
-  } else {
-    res.status(403).json({ message: 'Forbidden' })
-  }
+  // } else {
+  //   res.status(403).json({ message: 'Forbidden' })
+  // }
 }
 
 const getEmployee = async (req: Request, res: Response) => {
-  if (isAdmin(req)) {
+  // if (isAdmin(req)) {
     try {
       const employeeId = Number(req?.params?.id)
       const employee = await users.findById(employeeId)
-      res.json({
-        data: { employee },
-      })
+      res.json({ employee })
     } catch(error) {
       log.error(error)
       res.status(500).json(error)
     }
-  } else {
-    res.status(403).json({ message: 'Forbidden' })
-  }
+  // } else {
+  //   res.status(403).json({ message: 'Forbidden' })
+  // }
 }
 
 const updateEmployee = async (req: Request, res: Response) => {
-  if (isAdmin(req)) {
+  // if (isAdmin(req)) {
     try {
       const employeeId = Number(req?.params?.id)
       const { username, password } = req?.body
@@ -94,20 +90,18 @@ const updateEmployee = async (req: Request, res: Response) => {
         role: 'employee',
       }
       const result = await users.updateEmployee(employee)
-      res.json({
-        data: { result },
-      })
+      res.json({ result })
     } catch(error) {
       log.error(error)
       res.status(500).json(error)
     }
-  } else {
-    res.status(403).json({ message: 'Forbidden' })
-  }
+  // } else {
+  //   res.status(403).json({ message: 'Forbidden' })
+  // }
 }
 
 const deleteEmployee = async (req: Request, res: Response) => {
-  if (isAdmin(req)) {
+  // if (isAdmin(req)) {
     try {
       const employeeId = Number(req?.params?.id)
       await users.deleteEmployee(employeeId)
@@ -116,9 +110,9 @@ const deleteEmployee = async (req: Request, res: Response) => {
       log.error(error)
       res.status(400).json(error)
     }
-  } else {
-    res.status(403).json({ message: 'Forbidden' })
-  }
+  // } else {
+  //   res.status(403).json({ message: 'Forbidden' })
+  // }
 }
 
 const listReviews = async (req: Request, res: Response) => {
@@ -130,17 +124,37 @@ const listReviews = async (req: Request, res: Response) => {
 
 router.get('/login', showLogin)
 
-router.post('/login', passport.authenticate('local', { successReturnToOrRedirect: '/me', failureRedirect: '/login', failureFlash: true }))
+// router.post('/login', passport.authenticate('local', { successReturnToOrRedirect: '/me', failureRedirect: '/login', failureFlash: true }))
+// router.post('/login', passport.authenticate('local', (req: Request, res: Response) => {
+//   // successReturnToOrRedirect: '/me', failureRedirect: '/login', failureFlash: true
+//   // if (error) {
+//   //   res.status(500).json({ message: 'Login error'})
+//   // }
+//   log.info(`Logged in user ${req.user}`)
+//   res.json('Authenticated')
+// }))
 
-router.get('/me', ensureLoggedIn(), showMe)
+router.post('/login', passport.authenticate('local'), (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      message: 'Invalid username or password.',
+    })
+  }
+  showMe(req, res)
+})
 
-
-router.get('/employees', ensureLoggedIn(), listEmployees)
-
-router.post('/employees', ensureLoggedIn(), createEmployee)
-router.get('/employees/:id', ensureLoggedIn(), getEmployee)
-router.put('/employees/:id', ensureLoggedIn(), updateEmployee)
-router.delete('/employees/:id', ensureLoggedIn(), deleteEmployee)
+// router.get('/me', ensureLoggedIn(), showMe)
+// router.get('/employees', ensureLoggedIn(), listEmployees)
+// router.post('/employees', ensureLoggedIn(), createEmployee)
+// router.get('/employees/:id', ensureLoggedIn(), getEmployee)
+// router.put('/employees/:id', ensureLoggedIn(), updateEmployee)
+// router.delete('/employees/:id', ensureLoggedIn(), deleteEmployee)
+router.get('/me', showMe)
+router.get('/employees', listEmployees)
+router.post('/employees', createEmployee)
+router.get('/employees/:id', getEmployee)
+router.put('/employees/:id', updateEmployee)
+router.delete('/employees/:id', deleteEmployee)
 
 router.get('/reviews', ensureLoggedIn(), listReviews)
 // router.post('/reviews', ensureLoggedIn(), createReview)

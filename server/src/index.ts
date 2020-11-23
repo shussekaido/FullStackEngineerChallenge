@@ -10,6 +10,7 @@ import helmet from 'helmet'
 import passport from './auth'
 import cookieParser from 'cookie-parser'
 import expressSession from 'express-session'
+import flash from 'connect-flash'
 
 const env = process.env.NODE_ENV
 const API_HOST = process.env.API_HOST as string
@@ -32,6 +33,7 @@ app.use(expressSession({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(flash())
 
 app.use('/', router)
 
