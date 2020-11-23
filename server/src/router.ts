@@ -82,6 +82,7 @@ const updateEmployee = async (req: Request, res: Response) => {
       const { username, password } = req?.body
       if (!username || !password) {
         res.status(400).json({ message: 'Username and password must be provided' })
+        return
       }
       const employee = {
         id: employeeId,
