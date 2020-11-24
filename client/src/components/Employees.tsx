@@ -25,10 +25,6 @@ class Users extends Component {
       }
     }
 
-    edit = async (id: number) => {
-      //
-    }
-
     render() {
       let addButton = null
 
@@ -43,7 +39,8 @@ class Users extends Component {
 
       return (
         <Wrapper>
-          <h2>Employees</h2>
+          <h4 className="text-uppercase pt-4">Employees</h4>
+
           {addButton}
 
           <div className="table-responsive">
@@ -66,7 +63,8 @@ class Users extends Component {
                         <td>{user.role}</td>
                         <td>
                           <div className="btn-group mr-2">
-                            <Link to={`/employees/${user.id}/edit`} className="btn btn-sm btn-outline-secondary" onClick={() => this.edit(user.id)}>Edit</Link>
+                            <Link to={`/employees/${user.id}/reviews`} className="btn btn-sm btn-warning">Review</Link>
+                            <Link to={`/employees/${user.id}/edit`} className="btn btn-sm btn-outline-secondary">Edit</Link>
                             <a className="btn btn-sm btn-outline-secondary" onClick={() => this.delete(user.id)}>Delete</a>
                           </div>
                         </td>

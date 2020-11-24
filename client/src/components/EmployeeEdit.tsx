@@ -11,10 +11,10 @@ class UserEdit extends Component<{ match: PropsWithRef<any> }> {
       role: '',
       redirect: false,
     }
-    id = 0;
-    username = '';
-    password = '';
-    role = '';
+    id = 0
+    username = ''
+    password = ''
+    role = ''
 
     componentDidMount = async () => {
       this.id = this.props.match.params.id
