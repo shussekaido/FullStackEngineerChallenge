@@ -64,8 +64,8 @@ const createEmployee = async (req: Request, res: Response) => {
 const getEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
   try {
-    const employeeId = Number(req?.params?.id)
-    const employee = await users.findById(employeeId)
+    const userId = Number(req?.params?.id)
+    const employee = await users.findById(userId)
     res.json({ employee })
   } catch(error) {
     log.error(error)
@@ -79,14 +79,14 @@ const getEmployee = async (req: Request, res: Response) => {
 const updateEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
   try {
-    const employeeId = Number(req?.params?.id)
+    const userId = Number(req?.params?.id)
     const { username, password } = req?.body
     if (!username || !password) {
       res.status(400).json({ message: 'Username and password must be provided' })
       return
     }
     const employee = {
-      id: employeeId,
+      id: userId,
       username: username,
       password: await bcrypt.hash(password, 10),
       role: 'employee',
@@ -105,8 +105,8 @@ const updateEmployee = async (req: Request, res: Response) => {
 const deleteEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
   try {
-    const employeeId = Number(req?.params?.id)
-    await users.deleteEmployee(employeeId)
+    const userId = Number(req?.params?.id)
+    await users.deleteEmployee(userId)
     res.json({ message: 'Successfully deleted'})
   } catch(error) {
     log.error(error)
@@ -119,8 +119,8 @@ const deleteEmployee = async (req: Request, res: Response) => {
 
 const listUserReviews = async (req: Request, res: Response) => {
   try {
-    const employeeId = Number(req?.params?.id)
-    const query = { 'employeeId': Number(employeeId) }
+    const userId = Number(req?.params?.id)
+    const query = { 'userId': Number(userId) }
     const result = await blockchain.queryAllRecords(query)
     res.send(result)
   } catch(error) {

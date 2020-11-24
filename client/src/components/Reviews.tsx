@@ -16,18 +16,15 @@ class Reviews extends Component<{ match: PropsWithRef<any> }> {
       const userId = this.props.match.params.id
       const userCall = await axios.get(`http://localhost:3333/employees/${userId}`)
       const user: User = userCall.data.employee
-
-      const reviews = [
-        { id: 0, userId: this.state.userId, date: Date.now() },
-        { id: 1, userId: this.state.userId, date: Date.now() },
-        { id: 2, userId: this.state.userId, date: Date.now() },
-      ]
+      const reviews = await axios.get(`http://localhost:3333/employees/${userId}/reviews`)
 
       this.setState({
         userId: this.props.match.params.id,
         username: user.username,
-        reviews: reviews,
+        reviews: reviews.data,
       })
+
+      console.log(reviews)
     }
 
     render() {
@@ -49,7 +46,7 @@ class Reviews extends Component<{ match: PropsWithRef<any> }> {
             <table className="table table-striped table-sm">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Review ID</th>
                   <th>Date</th>
                   <th>Action</th>
                 </tr>
@@ -58,12 +55,12 @@ class Reviews extends Component<{ match: PropsWithRef<any> }> {
                 {this.state.reviews.map(
                   (review: Review) => {
                     return (
-                      <tr key={review.id}>
-                        <td>{review.id}</td>
+                      <tr key={review._id}>
+                        <td>{review._id}</td>
                         <td>{new Date(review.date).toLocaleString()}</td>
                         <td>
                           <div className="btn-group mr-2">
-                            <Link to={`/employees/${this.state.userId}/reviews/${review.id}/edit`} className="btn btn-sm btn-outline-secondary">Edit</Link>
+                            <Link to={`/employees/${this.state.userId}/reviews/${review._id}/edit`} className="btn btn-sm btn-outline-secondary">Edit</Link>
                           </div>
                         </td>
                       </tr>

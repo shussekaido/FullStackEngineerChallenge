@@ -1,10 +1,10 @@
 export class Review {
-    id: number;
+    _id: string;
     userId: number;
     date: Date;
 
-    constructor(id = 0, userId = 0, date = '') {
-      this.id = id
+    constructor(_id = '', userId = 0, date = '') {
+      this._id = _id
       this.userId = userId
       this.date = new Date(date)
     }
