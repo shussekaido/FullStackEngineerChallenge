@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import passport from './auth'
 import bcrypt from 'bcrypt'
 import * as users from './models/users'
+import * as blockchain from './blockchain'
 export const router = express.Router()
 import connectEnsureLogin from 'connect-ensure-login'
 const ensureLoggedIn = connectEnsureLogin.ensureLoggedIn
@@ -117,10 +118,56 @@ const deleteEmployee = async (req: Request, res: Response) => {
 }
 
 const listReviews = async (req: Request, res: Response) => {
-  /** Disable access */
-  res.status(403).json({
-    message: 'Forbidden',
-  })
+  try {
+    const result = await blockchain.getAllRecords()
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const createReview = async (req: Request, res: Response) => {
+  try {
+    const record = req?.body
+    const result = await blockchain.addRecord(record)
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const getReview = async (req: Request, res: Response) => {
+  try {
+    const query = req?.body
+    const result = await blockchain.getRecord(query)
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const getReviewVersion = async (req: Request, res: Response) => {
+  try {
+    const query = req?.body
+    const result = await blockchain.getRecordVersion(query)
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const getProof = async (req: Request, res: Response) => {
+  try {
+    const result = await blockchain.getProof()
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
 }
 
 router.get('/login', showLogin)
@@ -157,10 +204,14 @@ router.get('/employees/:id', getEmployee)
 router.put('/employees/:id', updateEmployee)
 router.delete('/employees/:id', deleteEmployee)
 
-router.get('/reviews', ensureLoggedIn(), listReviews)
+// router.get('/reviews', ensureLoggedIn(), listReviews)
 // router.post('/reviews', ensureLoggedIn(), createReview)
-// router.put('/reviews', ensureLoggedIn(), updateReview)
 // router.get('/reviews/:reviewId', ensureLoggedIn(), getReview)
+router.get('/reviews', listReviews)
+router.post('/reviews', createReview)
+router.get('/reviews/:reviewId', getReview)
+router.get('/reviews/:reviewId/version', getReviewVersion)
+router.get('/reviews/proof', getProof)
 
 router.get('/logout', (req, res) => {
   req.logout()

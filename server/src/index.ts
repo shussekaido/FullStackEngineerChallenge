@@ -4,6 +4,7 @@ dotenv.config()
 import cors from 'cors'
 import { router } from './router'
 import { initDB } from './models/db'
+import { initBlockchain } from './blockchain'
 import expressPino from 'express-pino-logger'
 import { log } from './logger'
 import helmet from 'helmet'
@@ -50,5 +51,6 @@ app.use((error: any, req: Request, res: Response) => {
 
 void async function main() {
   await initDB()
+  await initBlockchain()
   app.listen(API_PORT, API_HOST, () => log.info(`Starting on port ${API_PORT}. Environment is: ${env}`))
 }()
