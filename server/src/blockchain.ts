@@ -1,5 +1,5 @@
 import { log } from './logger'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectID } from 'mongodb'
 import ProvenDB from '@southbanksoftware/provendb-node-driver'
 
 const SERVICE_USERNAME = 'ppuser'
@@ -25,23 +25,81 @@ export const initBlockchain = async () => {
 }
 
 // Add a document object
+/*
+  Sample response:
+  {
+    "result": {
+        "ok": 1,
+        "n": 1
+    },
+    "connection": {
+        "_events": {},
+        "_eventsCount": 4,
+        "id": 1,
+        "address": "52.155.36.122:27017",
+        "bson": {},
+        "socketTimeout": 0,
+        "host": "ppchain.provendb.io",
+        "port": 27017,
+        "monitorCommands": false,
+        "closed": false,
+        "destroyed": false,
+        "lastIsMasterMS": 110
+    },
+    "ops": [
+        {
+            "_id": "5fbc71fc15252d5f7692566f"
+        }
+    ],
+    "insertedCount": 1,
+    "insertedId": "5fbc71fc15252d5f7692566f",
+    "ok": 1,
+    "n": 1
+  }
+*/
 export const addRecord = async(record: Object) => {
   const result = await collection.insertOne(record)
-  log.debug('Inserted a document.')
+  log.info('Inserted a document.')
   return result
 }
 
 // Fetch one record. Query example: { name: 'Michael' }
 export const getRecord = async(query: Object) => {
-  const result = await collection.find(query)
-  log.debug(`Record: ${JSON.stringify(result, null, 4)}`)
+  log.info(JSON.stringify(query))
+  const result = await collection.find(query).toArray()
+  log.info(`Record: ${JSON.stringify(result, null)}`)
+  return result
+}
+
+// Fetch one record by id
+export const getRecordById = async(id) => {
+  const _id = new ObjectID(id)
+  const query = { _id: _id}
+  const result = await collection.find(query).toArray()
+  log.info(`Record: ${JSON.stringify(result, null)}`)
+  return result
+}
+
+// Update record
+export const updateRecord = async(id, record) => {
+  const _id = new ObjectID(id)
+  const query = { _id: _id, record}
+  const result = await collection.update(query)
+  log.info(`Record: ${JSON.stringify(result, null)}`)
   return result
 }
 
 // Fetch all records
 export const getAllRecords = async() => {
   const result = await collection.find().toArray()
-  log.debug(`Records: ${JSON.stringify(result, null, 4)}`)
+  log.info(`Records: ${JSON.stringify(result, null)}`)
+  return result
+}
+
+// Fetch records by query
+export const queryAllRecords = async(query: Object) => {
+  const result = await collection.find(query).toArray()
+  log.info(`Records: ${JSON.stringify(result, null)}`)
   return result
 }
 
@@ -58,21 +116,21 @@ export const getAllRecords = async() => {
 */
 export const createProof = async() => {
   const result = await pdb.submitProof()
-  log.debug(`Submitted Proof: ${JSON.stringify(result, null, 4)}`)
+  log.info(`Submitted Proof: ${JSON.stringify(result, null)}`)
   return result
 }
 
 // Get blockchain proof
 export const getProof = async() => {
   const result = await pdb.getProof()
-  log.debug(`Latest Proof Is: ${JSON.stringify(result, null, 4)}`)
+  log.info(`Latest Proof Is: ${JSON.stringify(result, null)}`)
   return result
 }
 
 // Check current version of the entire collection
 export const getCollectionVersion = async() => {
   const result = await pdb.getVersion()
-  log.debug(`Version was ${result.version}.`)
+  log.info(`Version was ${result.version}.`)
   return result
 }
 
@@ -80,6 +138,6 @@ export const getCollectionVersion = async() => {
 export const getRecordVersion = async(query: Object) => {
   const response = await pdb.docHistory(collectionName, query)
   const result =response.docHistory[0]
-  log.debug(`History for document: ${JSON.stringify(result, null, 4)}`)
+  log.info(`History for document: ${JSON.stringify(result, null)}`)
   return result
 }

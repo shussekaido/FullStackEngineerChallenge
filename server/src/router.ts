@@ -23,13 +23,13 @@ const showMe = async (req: Request, res: Response) => {
 
 const listEmployees = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
-    try {
-      const employees = await users.findAllUsers()
-      res.json({ employees })
-    } catch(error) {
-      log.error(error)
-      res.status(500).json(error)
-    }
+  try {
+    const employees = await users.findAllUsers()
+    res.json({ employees })
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
   // } else {
   //   res.status(403).json({ message: 'Forbidden' })
   // }
@@ -37,25 +37,25 @@ const listEmployees = async (req: Request, res: Response) => {
 
 const createEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
-    try {
-      const { username, password } = req.body
-      const employee = {
-        username: username,
-        password: await bcrypt.hash(password, 10),
-        role: 'employee',
-      }
-      const result = await users.createEmployee(employee)
-      log.info(`Obtained new user data: ${JSON.stringify(employee)}`)
-
-      // res.json({
-      //   data: { employee },
-      //   response: result,
-      // })
-      res.json({ result })
-    } catch(error) {
-      log.error(error)
-      res.status(500).json(error)
+  try {
+    const { username, password } = req.body
+    const employee = {
+      username: username,
+      password: await bcrypt.hash(password, 10),
+      role: 'employee',
     }
+    const result = await users.createEmployee(employee)
+    log.info(`Obtained new user data: ${JSON.stringify(employee)}`)
+
+    // res.json({
+    //   data: { employee },
+    //   response: result,
+    // })
+    res.json({ result })
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
   // } else {
   //   res.status(403).json({ message: 'Forbidden' })
   // }
@@ -63,14 +63,14 @@ const createEmployee = async (req: Request, res: Response) => {
 
 const getEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
-    try {
-      const employeeId = Number(req?.params?.id)
-      const employee = await users.findById(employeeId)
-      res.json({ employee })
-    } catch(error) {
-      log.error(error)
-      res.status(500).json(error)
-    }
+  try {
+    const employeeId = Number(req?.params?.id)
+    const employee = await users.findById(employeeId)
+    res.json({ employee })
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
   // } else {
   //   res.status(403).json({ message: 'Forbidden' })
   // }
@@ -78,25 +78,25 @@ const getEmployee = async (req: Request, res: Response) => {
 
 const updateEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
-    try {
-      const employeeId = Number(req?.params?.id)
-      const { username, password } = req?.body
-      if (!username || !password) {
-        res.status(400).json({ message: 'Username and password must be provided' })
-        return
-      }
-      const employee = {
-        id: employeeId,
-        username: username,
-        password: await bcrypt.hash(password, 10),
-        role: 'employee',
-      }
-      const result = await users.updateEmployee(employee)
-      res.json({ result })
-    } catch(error) {
-      log.error(error)
-      res.status(500).json(error)
+  try {
+    const employeeId = Number(req?.params?.id)
+    const { username, password } = req?.body
+    if (!username || !password) {
+      res.status(400).json({ message: 'Username and password must be provided' })
+      return
     }
+    const employee = {
+      id: employeeId,
+      username: username,
+      password: await bcrypt.hash(password, 10),
+      role: 'employee',
+    }
+    const result = await users.updateEmployee(employee)
+    res.json({ result })
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
   // } else {
   //   res.status(403).json({ message: 'Forbidden' })
   // }
@@ -104,20 +104,32 @@ const updateEmployee = async (req: Request, res: Response) => {
 
 const deleteEmployee = async (req: Request, res: Response) => {
   // if (isAdmin(req)) {
-    try {
-      const employeeId = Number(req?.params?.id)
-      await users.deleteEmployee(employeeId)
-      res.json({ message: 'Successfully deleted'})
-    } catch(error) {
-      log.error(error)
-      res.status(400).json(error)
-    }
+  try {
+    const employeeId = Number(req?.params?.id)
+    await users.deleteEmployee(employeeId)
+    res.json({ message: 'Successfully deleted'})
+  } catch(error) {
+    log.error(error)
+    res.status(400).json(error)
+  }
   // } else {
   //   res.status(403).json({ message: 'Forbidden' })
   // }
 }
 
-const listReviews = async (req: Request, res: Response) => {
+const listUserReviews = async (req: Request, res: Response) => {
+  try {
+    const employeeId = Number(req?.params?.id)
+    const query = { 'employeeId': Number(employeeId) }
+    const result = await blockchain.queryAllRecords(query)
+    res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const listAllReviews = async (req: Request, res: Response) => {
   try {
     const result = await blockchain.getAllRecords()
     res.send(result)
@@ -131,6 +143,7 @@ const createReview = async (req: Request, res: Response) => {
   try {
     const record = req?.body
     const result = await blockchain.addRecord(record)
+    await blockchain.createProof()
     res.send(result)
   } catch(error) {
     log.error(error)
@@ -138,11 +151,23 @@ const createReview = async (req: Request, res: Response) => {
   }
 }
 
-const getReview = async (req: Request, res: Response) => {
+const getReviewById = async (req: Request, res: Response) => {
   try {
-    const query = req?.body
-    const result = await blockchain.getRecord(query)
+    const reviewId = req?.params?.id
+    const result = await blockchain.getRecordById(reviewId)
     res.send(result)
+  } catch(error) {
+    log.error(error)
+    res.status(500).json(error)
+  }
+}
+
+const updateReview = async (req: Request, res: Response) => {
+  try {
+    const reviewId = req?.params?.id
+    const record = req?.body
+    const result = await blockchain.updateRecord(reviewId, record)
+    res.json({ result })
   } catch(error) {
     log.error(error)
     res.status(500).json(error)
@@ -206,11 +231,13 @@ router.delete('/employees/:id', deleteEmployee)
 
 // router.get('/reviews', ensureLoggedIn(), listReviews)
 // router.post('/reviews', ensureLoggedIn(), createReview)
-// router.get('/reviews/:reviewId', ensureLoggedIn(), getReview)
-router.get('/reviews', listReviews)
+// router.get('/reviews/:id', ensureLoggedIn(), getReview)
+router.get('/employees/:id/reviews/', listUserReviews)
+router.get('/reviews/', listAllReviews)
 router.post('/reviews', createReview)
-router.get('/reviews/:reviewId', getReview)
-router.get('/reviews/:reviewId/version', getReviewVersion)
+router.get('/reviews/:id', getReviewById)
+router.put('/reviews/:id', updateReview)
+router.get('/reviews/:id/version', getReviewVersion)
 router.get('/reviews/proof', getProof)
 
 router.get('/logout', (req, res) => {
