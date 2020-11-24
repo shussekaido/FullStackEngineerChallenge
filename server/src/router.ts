@@ -176,8 +176,8 @@ const updateReview = async (req: Request, res: Response) => {
 
 const getReviewVersion = async (req: Request, res: Response) => {
   try {
-    const query = req?.body
-    const result = await blockchain.getRecordVersion(query)
+    const reviewId = req?.params?.id
+    const result = await blockchain.getRecordVersion(reviewId)
     res.send(result)
   } catch(error) {
     log.error(error)
@@ -185,6 +185,7 @@ const getReviewVersion = async (req: Request, res: Response) => {
   }
 }
 
+/* TODO: requires record version to get blockchain proof of that version */
 const getProof = async (req: Request, res: Response) => {
   try {
     const result = await blockchain.getProof()
@@ -238,7 +239,7 @@ router.post('/reviews', createReview)
 router.get('/reviews/:id', getReviewById)
 router.put('/reviews/:id', updateReview)
 router.get('/reviews/:id/version', getReviewVersion)
-router.get('/reviews/proof', getProof)
+router.get('/reviews/proof', getProof) // TODO
 
 router.get('/logout', (req, res) => {
   req.logout()

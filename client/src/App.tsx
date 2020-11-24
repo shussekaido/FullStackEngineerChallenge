@@ -8,6 +8,7 @@ import EmployeeCreate from './components/EmployeeCreate'
 import EmployeeEdit from './components/EmployeeEdit'
 import Reviews from './components/Reviews'
 import ReviewCreate from './components/ReviewCreate'
+import ReviewEdit from './components/ReviewEdit'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path={'/employees/:id/edit'} exact component={EmployeeEdit}/>
         <Route path={'/employees/:id/reviews'} exact component={Reviews}/>
         <Route path={'/employees/:id/reviews/create'} exact component={ReviewCreate}/>
+        <Route path={'/employees/:id/reviews/:reviewId/edit'} exact component={ReviewEdit}/>
       </BrowserRouter>
     </div>
   )

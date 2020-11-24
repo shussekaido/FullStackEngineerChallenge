@@ -6,7 +6,7 @@ const SERVICE_USERNAME = 'ppuser'
 const SERVICE_PASSWORD = 'VerySafePassword'
 const SERVICE_NAME = 'ppchain'
 const provenDB_URI = `mongodb://${SERVICE_USERNAME}:${SERVICE_PASSWORD}@ppchain.provendb.io/ppchain?ssl=true`
-const collectionName = 'provenReviewsTest'
+const collectionName = 'provenReviews'
 let connection
 let dbObject
 let collection
@@ -83,8 +83,11 @@ export const getRecordById = async(id) => {
 // Update record
 export const updateRecord = async(id, record) => {
   const _id = new ObjectID(id)
-  const query = { _id: _id, record}
-  const result = await collection.update(query)
+  const query1 = { _id: _id }
+  const query2 = { $set: { ...record }}
+  console.dir(query2)
+
+  const result = await collection.updateOne(query1, query2)
   log.info(`Record: ${JSON.stringify(result, null)}`)
   return result
 }
@@ -135,9 +138,11 @@ export const getCollectionVersion = async() => {
 }
 
 // Fetch the history of a record. Query example: { name: 'Michael' }
-export const getRecordVersion = async(query: Object) => {
+export const getRecordVersion = async(id) => {
+  const _id = new ObjectID(id)
+  const query = { _id: _id}
   const response = await pdb.docHistory(collectionName, query)
-  const result =response.docHistory[0]
+  const result = response.history[0]
   log.info(`History for document: ${JSON.stringify(result, null)}`)
   return result
 }

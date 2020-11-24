@@ -49,17 +49,17 @@ async function seed() {
       role: 'admin',
     }),
     User.create({
-      username: 'user1',
+      username: 'MaBeagle',
       password: hashedPassword,
       role: 'employee',
     }),
     User.create({
-      username: 'user2',
+      username: 'Gearloose',
       password: hashedPassword,
       role: 'employee',
     }),
     User.create({
-      username: 'user3',
+      username: 'BigtimeBeagle',
       password: hashedPassword,
       role: 'employee',
     }),
